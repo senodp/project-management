@@ -1,0 +1,37 @@
+# === Go build output ===
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Folders
+/bin/
+/build/
+/dist/
+/tmp/
+
+# Go workspace
+go.work
+
+# Logs
+*.log
+
+# Config / secrets
+.env
+.env.*
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Noted Learning
+.txt
