@@ -11,6 +11,8 @@ import (
 
 type UserService interface {
 	Register(user *models.User) error
+	//daftarkan login ke interface
+	Login (email,password string)(*models.User,error)
 }
 
 type userService struct{
@@ -42,5 +44,17 @@ func (s *userService)Register(user *models.User) error {
 	user.PublicID = uuid.New()
 
 	return s.repo.Create(user)
+}
+
+//fungsi untuk login
+func (s *userService) Login (email,password string)(*models.User,error){
+	user, err := s.repo.FindByEmail(email)
+	if err != nil{
+		return nil,errors.New("invalid credential")
+	}
+	if !utils.CheckPasswordHash(password, user.Password){
+		return nil, errors.New("invalid credential")
+	}
+	return user, nil
 }
 
