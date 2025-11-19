@@ -12,6 +12,7 @@ type UserRepository interface {
 	FindByEmail(email string) (*models.User, error)
 	FindByID(id uint) (*models.User,error)
 	FindByPublicID(publicID string) (*models.User,error)
+	FindAllPagination(filter, sort string, limit, ofset int)([]models.User,int64,error)
 }
 
 type userRepository struct{
