@@ -13,6 +13,8 @@ type UserService interface {
 	Register(user *models.User) error
 	//daftarkan login ke interface
 	Login (email,password string)(*models.User,error)
+	GetByID (id uint) (*models.User, error)
+	GetByPublicID (id string) (*models.User, error)
 }
 
 type userService struct{
@@ -57,4 +59,13 @@ func (s *userService) Login (email,password string)(*models.User,error){
 	}
 	return user, nil
 }
+
+func (s *userService) GetByID (id uint) (*models.User, error){
+	return s.repo.FindByID(id)
+}
+
+func (s *userService) GetByPublicID (id string) (*models.User, error){
+	return s.repo.FindByPublicID(id)
+}
+
 
