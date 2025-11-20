@@ -9,6 +9,7 @@ import (
 )
 
 type BoardService interface {
+	Create(board *models.Board) error
 }
 
 type boardService struct {
@@ -16,7 +17,7 @@ type boardService struct {
 	userRepo repositories.UserRepository
 }
 
-func newBoardService(
+func NewBoardService(
 	boardRepo repositories.BoardRepository,
 	userRepo repositories.UserRepository,
 	) BoardService {
