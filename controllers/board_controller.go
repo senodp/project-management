@@ -40,3 +40,31 @@ func (c *BoardController) CreateBoard(ctx *fiber.Ctx) error {
 
 	return utils.Success(ctx, "Board berhasil dibuat", board)
 }
+
+func (c *BoardController) UpdateBoard (ctx *fiber.Ctx) error{
+	publicID := ctx.Params("id")
+	board := new (models.Board)
+
+  if err := ctx.BodyParser(board); err != nil{
+		return utils.BadRequest(ctx, "Gagal Parsing Data!", err.Error())
+	}
+
+	if _, err := uuid.Parse(publicID); err != nil{
+		return utils.BadRequest(ctx, "ID Tidak Valid!", err.Error())
+	}
+	//ambil existing board
+	existingBoard, err := c.service.GetByPublicID(publicID)
+	if err != nil{
+		return utils.NotFound(ctx, "Board tidak ditemukan!", err.Error())
+	}
+	board.InternalID = existingBoard.InternalID
+	board.PublicID = existingBoard.PublicID
+	board.OwnerID = existingBoard.OwnerID
+	board.OwnerPublicID = existingBoard.OwnerPublicID
+	board.CreatedAt = existingBoard.CreatedAt
+
+	if err := c.service.Update(board); err != nil{
+		return utils.BadRequest(ctx, "Gagal Update Board!", err.Error())
+	}
+	return utils.Success(ctx, "Board berhasil diperbarui!", board)
+}
