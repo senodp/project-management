@@ -1,9 +1,16 @@
 package services
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/google/uuid"
+	"github.com/senodp/project-management/config"
 	"github.com/senodp/project-management/models"
+	"github.com/senodp/project-management/models/types"
 	"github.com/senodp/project-management/repositories"
+	"github.com/senodp/project-management/utils"
+	"gorm.io/gorm"
 )
 
 type listService struct {
@@ -27,7 +34,7 @@ type ListService interface {
 	UpdatePositions(boardPublicID string, positions []uuid.UUID) error 
 }
 
-func NewListService(listRepo repositories.ListRepository, boardRepo repositories.BoardRepository 
+func NewListService(listRepo repositories.ListRepository, boardRepo repositories.BoardRepository,
 	listPosRepo repositories.ListPositionRepository) ListService{
 	return &listService{listRepo,boardRepo,listPosRepo}
 }
@@ -129,3 +136,27 @@ func (s *listService) Create(list *models.List) error {
 		}
 		return nil
 	}
+
+func (s *listService) Update(list *models.List) error {
+	return s.listRepo.Update(list)
+}
+
+func (s *listService) Delete(id uint) error {
+	return s.listRepo.Delete(id)
+}
+
+func (s *listService) UpdatePositions(boardPublicID string, positions []uuid.UUID) error {
+	// verifikasi board
+	board, err := s.boardRepo.FindByPublicID(boardPublicID)
+	if err != nil {
+		return errors.New("board not found")
+	}
+	// get list position
+	position, err := s.listPosRepo.GetByBoard(board.PublicID.String())
+	if err != nil {
+		return errors.New("list position not found")
+	}
+
+	position.ListOrder = positions	
+	return s.listPosRepo.UpdateListOrder(position)
+}
