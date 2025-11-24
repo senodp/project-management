@@ -45,6 +45,6 @@ func Setup(app *fiber.App,
 	boardGroup.Get("/my", bc.GetMyBoardPaginate)
 
 	//list
-	listGroup := api.Group("/list")
+	listGroup := api.Group("/lists")
 	listGroup.Post("/", lc.CreateList)
 }
