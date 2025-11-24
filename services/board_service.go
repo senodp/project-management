@@ -14,6 +14,8 @@ type BoardService interface {
 	GetByPublicID(publicID string)(*models.Board, error)
 	AddMembers(boardPublicID string, userPublicIDS []string)error
 	RemoveMembers(boardPublicID string, userPublicIDs []string)error
+	GetAllByUserPaginate(userID, filter, sort string, limit, 
+		offset int)([]models.Board, int64, error)
 }
 
 type boardService struct {
@@ -51,14 +53,14 @@ func (s *boardService) GetByPublicID(publicID string)(*models.Board, error){
 func (s *boardService) AddMembers(boardPublicID string, userPublicIDS []string)error{
 	board, err := s.boardRepo.FindByPublicID(boardPublicID)
 	if err != nil{
-		return errors.New("Board Not Found!")
+		return errors.New("board not found")
 	}
 
 	var userInternalIDs []uint
 	for _, userPublicID := range userPublicIDS{
 		user, err := s.userRepo.FindByPublicID(userPublicID)
 		if err != nil{
-			return errors.New("User Not Found! "+ userPublicID)
+			return errors.New("user not found"+ userPublicID)
 		}
 		//kumpulkan IDnya ke user internal id
 		userInternalIDs = append(userInternalIDs, uint(user.InternalID))
@@ -91,7 +93,7 @@ func (s *boardService) RemoveMembers (boardPublicID string, userPublicIDs []stri
 	//cek apakah ada atau tidak
 	board, err := s.boardRepo.FindByPublicID(boardPublicID)
 	if err != nil{
-		return errors.New("Board Not Found!")
+		return errors.New("board not found")
 	}
 
 	//validasi user apakah dia user kita atau tidak
@@ -125,3 +127,8 @@ func (s *boardService) RemoveMembers (boardPublicID string, userPublicIDs []stri
 	}
 	return s.boardRepo.RemoveMembers(uint(board.InternalID), memberToRemove)
 }
+
+func (s *boardService) GetAllByUserPaginate (userID, filter, sort string, limit, 
+	offset int)([]models.Board, int64, error){
+		return s.boardRepo.FindAllByUserPagination(userID,filter,sort,limit,offset)
+	}
