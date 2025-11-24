@@ -26,3 +26,34 @@ type ListService interface {
 	Delete(id uint) error
 	UpdatePositions(boardPublicID string, positions []uuid.UUID) error 
 }
+
+func NewListService(listRepo repositories.ListRepository, boardRepo repositories.BoardRepository 
+	listPosRepo repositories.ListPositionRepository) ListService{
+	return &listService{listRepo,boardRepo,listPosRepo}
+}
+
+func (s *listService) GetByBoardID(boardPublicID string) (*ListWithOrder, error) {
+	// verifikasi board
+
+	_, err :=  s.boardRepo.FindByPublicID(boardPublicID)
+	if err != nil {
+		return nil, errors.New("board not found")
+	}
+
+	positions, err := s.listPosRepo.GetListOrder(boardPublicID)
+	if err != nil {
+		return nil, errors.New("failed to get list order : " + err.Error())
+	}
+
+	lists, err := s.listRepo.FindByBoardID(boardPublicID)
+	if err != nil {
+		return nil, errors.New("failed to get list : " + err.Error())
+	}
+
+	//sorting by position
+	orderedList :=  utils.SortListByPosition(lists,positions)
+	return &ListWithOrder{
+		Position: positions,
+		Lists: orderedList,
+	},nil
+}
