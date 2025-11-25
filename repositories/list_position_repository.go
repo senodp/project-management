@@ -24,7 +24,7 @@ func (r *listPositionRepository) GetByBoard(boardPublicID string)(*models.ListPo
 	var position models.ListPosition
 
 	err := config.DB.Joins("JOIN boards ON boards.internal_id = list_positions.board_internal_id").
-	Where("boards.public_id = ?",boardPublicID).Error
+	Where("boards.public_id = ?",boardPublicID).First(&position).Error
 
 	return &position, err
 }

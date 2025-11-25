@@ -57,3 +57,18 @@ func (c *ListController) UpdateList(ctx *fiber.Ctx) error {
 
 	return  utils.Success(ctx, "Berhasil Memperbarui List", updatedList)
 }
+
+func (c *ListController) GetListOnBoard(ctx *fiber.Ctx) error {
+	boardPublicID := ctx.Params("board_id")
+	if _, err := uuid.Parse(boardPublicID); err != nil {
+		return utils.BadRequest(ctx, "ID tidak valid", err.Error())
+	}
+
+	lists, err := c.services.GetByBoardID(boardPublicID)
+	if err != nil {
+		return utils.NotFound(ctx, "List Tidak Di temmukan", err.Error())
+	}
+
+	return utils.Success(ctx, "Data Berhasil Di Ambil",lists)
+}
+
